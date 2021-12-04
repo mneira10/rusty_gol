@@ -1,9 +1,10 @@
-use std::io::{stdin, stdout, Read, StdoutLock, Write};
+use std::io::{stdin, stdout, Read, Write};
 use termion::raw::IntoRawMode;
 use termion::{clear, color, cursor, style};
 
 const GAME_TITLE: &str = "Conway's game of life.";
 const GAME_AUTHOR: &str = "by Sharp Rabbit";
+const INSTRUCTIONS: &str = "q to quit, s to start, r to reset";
 
 struct Game {
     width: u16,
@@ -13,20 +14,25 @@ struct Game {
 impl Game {
     fn get_main_screen(&self) -> String {
         return format!(
-            "{}{}{}{}{}{}{}{}",
+            "{}{}{}{}{}{}{}{}{}{}",
             clear::All,
             style::Bold,
             cursor::Goto(
                 (self.width - GAME_TITLE.chars().count() as u16) / 2,
-                self.height / 2
+                self.height / 2 - 2
             ),
             GAME_TITLE,
             style::Reset,
             cursor::Goto(
                 (self.width - GAME_AUTHOR.chars().count() as u16) / 2,
-                self.height / 2 + 2
+                self.height / 2
             ),
             GAME_AUTHOR,
+            cursor::Goto(
+                (self.width - INSTRUCTIONS.chars().count() as u16) / 2,
+                self.height / 2 + 2
+            ),
+            INSTRUCTIONS,
             cursor::Hide
         );
     }
