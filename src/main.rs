@@ -5,10 +5,12 @@ use termion::{clear, color, cursor, style};
 const GAME_TITLE: &str = "Conway's game of life.";
 const GAME_AUTHOR: &str = "by Sharp Rabbit";
 const INSTRUCTIONS: &str = "q to quit, s to start, r to reset";
+const SQUARE_CHAR: &str = "#";
 
 struct Game {
     width: u16,
     height: u16,
+    state: Vec<Vec<bool>>,
 }
 
 impl Game {
@@ -36,6 +38,34 @@ impl Game {
             cursor::Hide
         );
     }
+
+    fn paint_state(&self) -> String {
+        let mut output_string: String = format!("{}", clear::All,);
+        // for i in 1..10 {
+        //     output_string.push_str(&format!("{}{}", cursor::Goto(i, 5), SQUARE_CHAR)[..]);
+        // }
+        for (row_i, row) in self.state.iter().enumerate() {
+            for (col_i, value) in row.iter().enumerate() {
+                if *value {
+                    output_string.push_str(
+                        &format!(
+                            "{}{}",
+                            cursor::Goto((col_i + 1) as u16, (row_i + 1) as u16),
+                            SQUARE_CHAR
+                        )[..],
+                    );
+                }
+
+                // output_string
+                //     .push_str(&format!("{}{}", cursor::Goto(3 as u16, 3 as u16), SQUARE_CHAR)[..]);
+            }
+        }
+
+        // println!("aaaa{}", output_string);
+
+        return output_string;
+    }
+    // fn evolve(&self) {}
 }
 
 fn main() {
@@ -47,9 +77,20 @@ fn main() {
 
     let (width, height) = termion::terminal_size().ok().unwrap();
 
+    let mut game_life = Vec::new();
+
+    for _ in 1..height {
+        let mut temp_vec = Vec::new();
+        for _ in 1..width {
+            temp_vec.push(true);
+        }
+        game_life.push(temp_vec);
+    }
+
     let game = Game {
         width: width,
         height: height,
+        state: game_life,
     };
 
     write!(stdout, "{}", game.get_main_screen());
@@ -64,8 +105,8 @@ fn main() {
             b'q' => return,
             // Clear the screen
             b'c' => write!(stdout, "{}", termion::clear::All),
-            // Set red color
-            b'r' => write!(stdout, "{}", color::Fg(color::Rgb(5, 0, 0))),
+            b's' => write!(stdout, "{}", game.paint_state()),
+            b'a' => write!(stdout, "{}", game.get_main_screen()),
             // Write it to stdout.
             a => write!(stdout, "{}", a),
         }
